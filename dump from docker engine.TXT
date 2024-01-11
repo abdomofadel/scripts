@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Specify the path for the MongoDB backup file
+mongo_backup_file=/root/mongo_dockerengine/mongodb_backup_$(date +"%Y%m%d%H%M%S").tar.gz
+
+echo "Step 1: Dumping MongoDB from host machine..."
+mongodump --out="/tmp/mongodump"
+tar -czf "$mongo_backup_file" -C /tmp mongodump
+rm -rf /tmp/mongodump
+echo "MongoDB backup completed and saved to $mongo_backup_file"
+
+# Check if MongoDB dump was successful
+if [ $? -eq 0 ]; then
+    echo "Step 1 completed successfully."
+else
+    echo "Step 1 failed. Exiting script."
+    exit 1
+fi
+
+# Additional steps if needed...
+
+echo "All steps completed successfully!"

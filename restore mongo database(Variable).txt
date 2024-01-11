@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Specify the path to the MongoDB backup file
+
+read -p "Enter the path to the MongoDB backup file: " backup_file
+
+# Run mongorestore to restore all databases
+docker exec -i mongo mongorestore --drop --gzip --archive="$backup_file"
+
+echo "MongoDB restore completed"

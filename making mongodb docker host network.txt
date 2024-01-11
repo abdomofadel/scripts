@@ -1,0 +1,1 @@
+docker run -d --name my-mongo --network host mongo:4.2.6 mongod timeout 5h

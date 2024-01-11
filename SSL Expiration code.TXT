@@ -1,0 +1,23 @@
+#!/bin/bash
+
+SLACK_WEBHOOK_URL="https://hooks.slack.com/services/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"
+DAYS_BEFORE_EXPIRY=30
+URLS_FILE="urls.txt"
+
+while read -r url; do
+    # Remove leading and trailing whitespaces and marks
+    url=$(echo "${url}" | tr -d '[:space:][:punct:]')
+
+    # Check if the URL is not empty after removing whitespaces and marks
+    if [ -n "${url}" ]; then
+        expiration_date=$(openssl s_client -connect "${url}:443" -servername "${url}" 2>/dev/null | openssl x509 -noout -enddate | cut -d= -f2)
+        expiration_timestamp=$(date -d "${expiration_date}" +%s)
+        current_timestamp=$(date +%s)
+        expiration_days=$(( (expiration_timestamp - current_timestamp) / 86400 ))
+
+        if [ "${expiration_days}" -lt "${DAYS_BEFORE_EXPIRY}" ]; then
+            message="Attention! The SSL certificate for ${url} will expire in ${expiration_days} days."
+            curl -s -X POST -H 'Content-type: application/json' --data "{\"text\":\"${message}\"}" "${SLACK_WEBHOOK_URL}" > /dev/null
+        fi
+    fi
+done < "${URLS_FILE}"

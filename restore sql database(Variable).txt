@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Prompt the user to enter the path to the MySQL backup file
+read -p "Enter the path to the MySQL backup file: " backup_file
+
+# MySQL connection details
+mysql_root_password="admin"
+mysql_database="admin"
+mysql_user="admin"
+mysql_password="admin"
+
+# Run MySQL restore
+gunzip < "$backup_file" | docker exec -i db mysql -u"$mysql_user" -p"$mysql_password" "$mysql_database"
+
+echo "MySQL restore completed"

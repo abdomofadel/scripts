@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Specify the path for the MongoDB backup file
+mongo_backup_file="mongodb_backup_$(date +"%Y%m%d%H%M%S").tar.gz"
+
+# Dump MongoDB
+docker exec -i mongo-test mongodump --out="/tmp/mongodump"
+tar -czf "$mongo_backup_file" -C /tmp mongodump
+docker exec -i mongo-test rm -rf /tmp/mongodump
+echo "MongoDB backup completed and saved to $mongo_backup_file"
+
+# Restore MySQL from MongoDB dump
+gunzip < "$mongo_backup_file" | docker exec -i db-test mysql -u admin --password=admin --binary-mode=1
+echo "MySQL restore completed"
+# Check if MySQL restore was successful
+if [ $? -eq 0 ]; then
+    echo "Step 2 completed successfully."
+else
+    echo "Step 2 failed. Exiting script."
+    exit 1
+fi
+
+echo "All steps completed successfully!"

@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# Set the date of the backup file
+backup_date=$(date +"%Y%m%d%H%M%S")
+
+# Specify the backup directory
+backup_dir="/root/mongo_backup"
+
+# Create a directory for the backup
+mkdir -p "$backup_dir"
+
+# Run mongodump to dump all databases and archive the data using tar
+docker exec -it mongo mongodump --out="/tmp/mongodump" && tar -czf "$backup_dir/mongodb_backup_$backup_date.tar.gz" -C /tmp mongodump
+
+# Remove the temporary dump directory
+docker exec -it mongo rm -rf /tmp/mongodump
+
+echo "Backup completed and saved to $backup_dir/mongodb_backup_$backup_date.tar.gz"
